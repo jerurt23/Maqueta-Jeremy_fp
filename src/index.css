@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@layer utilities {
+  /* Custom scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+}
+
+/* Leaflet custom marker pins */
+.custom-map-marker-yellow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background-color: #f59e0b;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4), 0 2px 4px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-map-marker-yellow:hover, .custom-map-marker-yellow.active {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.25), 0 6px 16px rgba(0,0,0,0.25);
+  background-color: #d97706;
+}
+
+.custom-map-marker-red {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background-color: #ef4444;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4), 0 2px 4px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-map-marker-red:hover, .custom-map-marker-red.active {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.25), 0 6px 16px rgba(0,0,0,0.25);
+  background-color: #dc2626;
+}
+
+/* Ensure Leaflet controls don't overlap awkwardly with drawer */
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+  background-color: #ffffff !important;
+  color: #334155 !important;
+  font-weight: bold !important;
+  border: none !important;
+  width: 34px !important;
+  height: 34px !important;
+  line-height: 34px !important;
+  transition: background-color 0.15s;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}

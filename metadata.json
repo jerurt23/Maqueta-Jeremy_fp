@@ -1,0 +1,6 @@
+{
+  "name": "FiberPro - Gestión de Operaciones Técnicas",
+  "description": "Sistema de gestión y despacho técnico en mapa para telecomunicaciones y fibra óptica con integración Odoo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
