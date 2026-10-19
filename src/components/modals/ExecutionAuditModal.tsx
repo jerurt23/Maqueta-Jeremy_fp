@@ -46,6 +46,7 @@ import { SAMPLE_PHOTOS, DEFAULT_MATERIALES, EQUIPMENT_CATALOG } from '../../data
 import { PhotoLightboxViewer } from './PhotoLightboxViewer';
 import { VTModal } from './VTModal';
 import { RetiroModal } from './RetiroModal';
+import { HoraFinalField, formatFechaHoraFin } from './wizardShared';
 
 interface SaveLockButtonProps {
   isLocked: boolean;
@@ -1314,6 +1315,7 @@ export const ExecutionAuditModal: React.FC<ExecutionAuditModalProps> = ({
         registrado: true,
       },
       estado: 'LIQUIDADO',
+      horaFin: formatFechaHoraFin(),
       pasos: {
         ...task.pasos,
         paso3: 'Completado',
@@ -1345,6 +1347,7 @@ export const ExecutionAuditModal: React.FC<ExecutionAuditModalProps> = ({
         registrado: true,
       },
       estado: 'LIQUIDADO',
+      horaFin: formatFechaHoraFin(),
       pasos: {
         ...task.pasos,
         paso3: 'Completado',
@@ -3726,14 +3729,17 @@ export const ExecutionAuditModal: React.FC<ExecutionAuditModalProps> = ({
             {/* STEP 3: CIERRE Y OBSERVACIONES TÉCNICAS */}
             {activeStep === 3 && (
               <div className="space-y-5 animate-in fade-in duration-150">
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 flex-wrap">
                   <div className="w-9 h-9 rounded-xl bg-[#0284c7] text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-xs">
                     3
                   </div>
-                  <div>
-                    <h3 className="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight">
-                      Paso 3: Cierre y Observaciones Técnicas
-                    </h3>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <h3 className="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight">
+                        Paso 3: Cierre y Observaciones Técnicas
+                      </h3>
+                      <HoraFinalField task={task} />
+                    </div>
                   </div>
                 </div>
 

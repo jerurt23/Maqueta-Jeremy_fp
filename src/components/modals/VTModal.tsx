@@ -36,7 +36,7 @@ import {
 import { TaskData, PhotoEvidence, VTDañoData, VTMaterialesData, VTEquiposData, VTPaso3Data } from '../../types/task';
 import { SAMPLE_PHOTOS, DEFAULT_MATERIALES } from '../../data/mockData';
 import { PhotoLightboxViewer } from './PhotoLightboxViewer';
-import { Switch, SectionHeader, DropZone, SaveLockButton } from './wizardShared';
+import { Switch, SectionHeader, DropZone, SaveLockButton, HoraFinalField, formatFechaHoraFin } from './wizardShared';
 
 interface VTModalProps {
   task: TaskData;
@@ -210,6 +210,7 @@ export const VTModal: React.FC<VTModalProps> = ({
     onUpdateTask({
       pagoInfo: { tipoPago: selectedTipoPago, precio: precio || 'S/ 0.00', registrado: true },
       estado: 'LIQUIDADO',
+      horaFin: formatFechaHoraFin(),
       pasos: { ...task.pasos, paso3: 'Completado' },
       cambiosRegistrados: [nowLog, ...(task.cambiosRegistrados || [])],
     });
@@ -815,9 +816,14 @@ export const VTModal: React.FC<VTModalProps> = ({
             {/* PASO 3 */}
             {activeStep === 3 && (
               <div className="space-y-5 animate-in fade-in duration-150">
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 flex-wrap">
                   <div className="w-9 h-9 rounded-xl bg-amber-500 text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-xs">3</div>
-                  <h3 className="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight">Paso 3: Cierre y Observaciones Técnicas</h3>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <h3 className="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight">Paso 3: Cierre y Observaciones Técnicas</h3>
+                      <HoraFinalField task={task} />
+                    </div>
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                   {/* COLUMNA IZQUIERDA: Fotos Generales (siempre visible, igual que Paso 2) */}

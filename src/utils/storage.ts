@@ -15,7 +15,7 @@ const WARN_RATIO = 0.85;
  * esquema. Al agregar campos nuevos (vtRetiro, rtRetiro, etc.) hay que
  * subir la version para forzar una relectura limpia de INITIAL_TASKS.
  */
-const SCHEMA_VERSION = '1';
+const SCHEMA_VERSION = '2';
 
 function bytesOf(value: string): number {
   // approximate: 2 bytes por char en UTF-16

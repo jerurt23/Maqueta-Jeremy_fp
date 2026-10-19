@@ -193,6 +193,8 @@ export interface TaskData {
   jefeSeleccionado: string;
   tecSeleccionado: string;
   horaInicio: string;
+  /** Fecha y hora oficial de finalización (dd/mm/yyyy hh:mm), escrita al cerrar el Paso 3. */
+  horaFin?: string;
   pasos: {
     paso1: 'Pendiente' | 'En Proceso' | 'Completado';
     paso2: 'Pendiente' | 'En Proceso' | 'Completado';
