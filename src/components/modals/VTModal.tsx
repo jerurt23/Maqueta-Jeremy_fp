@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   X,
   Camera,
@@ -32,11 +32,13 @@ import {
   ChevronDown,
   ChevronUp,
   CheckCircle,
+  ClipboardList,
 } from 'lucide-react';
 import { TaskData, PhotoEvidence, VTDañoData, VTMaterialesData, VTEquiposData, VTPaso3Data } from '../../types/task';
 import { SAMPLE_PHOTOS, DEFAULT_MATERIALES } from '../../data/mockData';
 import { PhotoLightboxViewer } from './PhotoLightboxViewer';
 import { Switch, SectionHeader, DropZone, SaveLockButton } from './wizardShared';
+import { TecnicoEjecucionVisitaModal, GuardarEjecucionVisitaPayload } from './TecnicoEjecucionVisitaModal';
 
 interface VTModalProps {
   task: TaskData;
@@ -93,6 +95,7 @@ export const VTModal: React.FC<VTModalProps> = ({
   const [isDañoExpanded, setIsDañoExpanded] = useState(true);
   const [isMaterialesExpanded, setIsMaterialesExpanded] = useState(true);
   const [isEquiposExpanded, setIsEquiposExpanded] = useState(true);
+  const [isEjecucionModalOpen, setIsEjecucionModalOpen] = useState(false);
 
   const vtDaño: VTDañoData = task.vtDaño || {
     activo: true, fotosDaño: [], fotosPotenciaInicial: [], fotosPotenciaFinal: [], fotosKmz: [],
@@ -461,6 +464,14 @@ export const VTModal: React.FC<VTModalProps> = ({
                   <div className="w-9 h-9 rounded-xl bg-amber-500 text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-xs">2</div>
                   <h3 className="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight">Paso 2: Evidencias Técnicas y Equipos</h3>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setIsEjecucionModalOpen(true)}
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-[#0066ff] hover:bg-[#0052cc] text-white rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer active:scale-95 ml-auto"
+                >
+                  <ClipboardList className="w-3.5 h-3.5" />
+                  <span>Ejecución Visita (Stock Técnico)</span>
+                </button>
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                   {/* Fotos Generales */}
                   <div className="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-4.5 space-y-3.5 shadow-2xs">
@@ -941,6 +952,39 @@ export const VTModal: React.FC<VTModalProps> = ({
 
       <PhotoLightboxViewer isOpen={viewerState.isOpen} photos={viewerState.photos} initialIndex={viewerState.initialIndex}
         onClose={() => setViewerState((prev) => ({ ...prev, isOpen: false }))} />
+
+      <TecnicoEjecucionVisitaModal
+        isOpen={isEjecucionModalOpen}
+        onClose={() => setIsEjecucionModalOpen(false)}
+        onSave={(payload) => {
+          const isFull = !Array.isArray(payload);
+          const photos = isFull ? payload.photos : payload;
+          const installed = isFull ? (payload as GuardarEjecucionVisitaPayload).equiposInstalados : [];
+
+          const updates: Partial<TaskData> = {
+            fotosEvidencias: [...(photos || []), ...fotosEvidencias],
+            pasos: { ...task.pasos, paso2: 'Completado' },
+          };
+          if (installed && installed.length > 0) {
+            const ont = installed.find((eq) => eq.tipo === 'Router ONT');
+            const deco = installed.find((eq) => eq.tipo === 'Decodificador TV');
+            const rep = installed.find((eq) => eq.tipo === 'Repetidor Wi-Fi');
+            if (ont) {
+              updates.datoOnt = `${ont.marca} ${ont.modelo}`.trim();
+              updates.macNoc = ont.mac;
+            }
+            if (rep) {
+              updates.marcaRepetidor = rep.marca;
+              updates.nroRepetidor = rep.sn;
+            }
+            if (deco) {
+              updates.macTv = deco.mac;
+            }
+          }
+          onUpdateTask(updates);
+          onShowToast('Ejecución de visita registrada correctamente con stock técnico');
+        }}
+      />
     </div>
   );
 };

@@ -10,6 +10,8 @@ import {
   Tag,
   Clock,
   Move,
+  ThumbsUp,
+  ThumbsDown,
 } from 'lucide-react';
 import { PhotoEvidence } from '../../types/task';
 
@@ -18,6 +20,10 @@ export interface PhotoLightboxViewerProps {
   photos: PhotoEvidence[];
   initialIndex?: number;
   onClose: () => void;
+  onEvaluacionChange?: (
+    id: string,
+    evaluacion: 'Bueno' | 'Malo' | ''
+  ) => void;
 }
 
 export const PhotoLightboxViewer: React.FC<PhotoLightboxViewerProps> = ({
@@ -25,6 +31,7 @@ export const PhotoLightboxViewer: React.FC<PhotoLightboxViewerProps> = ({
   photos,
   initialIndex = 0,
   onClose,
+  onEvaluacionChange,
 }) => {
   const [currentIndex, setCurrentIndex] = useState<number>(initialIndex);
   const [zoom, setZoom] = useState<number>(1);
@@ -283,8 +290,26 @@ export const PhotoLightboxViewer: React.FC<PhotoLightboxViewerProps> = ({
             src={currentPhoto.url}
             alt={currentPhoto.title || 'Foto ampliada'}
             draggable={false}
-            className="max-w-[90vw] max-h-[78vh] object-contain rounded-lg shadow-2xl drop-shadow-2xl select-none"
+            className={`max-w-[90vw] max-h-[78vh] object-contain rounded-lg shadow-2xl drop-shadow-2xl select-none ${
+              currentPhoto.evaluacion === 'Malo' ? 'opacity-85' : ''
+            }`}
           />
+
+          {/* Píldora de evaluación sobre la imagen (misma posición que en la galería: esquina superior izquierda) */}
+          {currentPhoto.evaluacion === 'Malo' && (
+            <div className="absolute top-3 left-3 z-20">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold border shadow-md bg-red-100 text-red-700 border-red-200">
+                MALO
+              </span>
+            </div>
+          )}
+          {currentPhoto.evaluacion === 'Bueno' && (
+            <div className="absolute top-3 left-3 z-20">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold border shadow-md bg-emerald-100 text-emerald-700 border-emerald-200">
+                BUENO
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Navigation Arrows on Left and Right (visible if more than 1 photo) */}
@@ -341,6 +366,37 @@ export const PhotoLightboxViewer: React.FC<PhotoLightboxViewerProps> = ({
             <span>Esc: Cerrar</span>
           </span>
         </div>
+
+        {/* Evaluación de la foto (solo fotos de caja / splitter) */}
+        {currentPhoto.type === 'caja' && onEvaluacionChange && (
+          <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-xl border border-white/10 backdrop-blur-sm">
+            <span className="text-[10px] text-slate-300 font-medium">Evaluar foto:</span>
+            <button
+              type="button"
+              onClick={() => onEvaluacionChange(currentPhoto.id, 'Bueno')}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                currentPhoto.evaluacion === 'Bueno'
+                  ? 'bg-emerald-500 text-white shadow-sm'
+                  : 'bg-white/10 text-emerald-300 hover:bg-emerald-200/30 border border-emerald-300/30'
+              }`}
+            >
+              <ThumbsUp className="w-3 h-3" />
+              <span>Bueno</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onEvaluacionChange(currentPhoto.id, 'Malo')}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                currentPhoto.evaluacion === 'Malo'
+                  ? 'bg-red-500 text-white shadow-sm'
+                  : 'bg-white/10 text-red-300 hover:bg-red-200/30 border border-red-300/30'
+              }`}
+            >
+              <ThumbsDown className="w-3 h-3" />
+              <span>Malo</span>
+            </button>
+          </div>
+        )}
 
         {/* Toolbar Buttons: Zoom Out, Percentage, Zoom In, Reset */}
         <div className="flex items-center gap-1.5 bg-white/10 p-1 rounded-xl border border-white/10 shrink-0">

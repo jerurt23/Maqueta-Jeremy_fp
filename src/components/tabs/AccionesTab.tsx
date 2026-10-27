@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { TaskData } from '../../types/task';
 import { JEFES_TECNICOS, TECNICOS_POR_JEFE } from '../../data/mockData';
+import { TecnicoEjecucionVisitaModal, GuardarEjecucionVisitaPayload } from '../modals/TecnicoEjecucionVisitaModal';
 
 interface AccionesTabProps {
   task: TaskData;
@@ -35,6 +36,7 @@ export const AccionesTab: React.FC<AccionesTabProps> = ({
   const [tecnico, setTecnico] = useState(task.tecSeleccionado || '');
   const [isSavingReasign, setIsSavingReasign] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isEjecucionModalOpen, setIsEjecucionModalOpen] = useState(false);
   const currentActividad = task.tipoActividad || (task.initials === 'VT' ? 'VT' : task.initials === 'R' ? 'R' : 'I');
 
   // Available technicians based on chosen chief
@@ -44,6 +46,42 @@ export const AccionesTab: React.FC<AccionesTabProps> = ({
     const newJefe = e.target.value;
     setJefe(newJefe);
     setTecnico(''); // reset technician selection
+  };
+
+  const handleSaveEjecucion = (payload: any) => {
+    const isFull = !Array.isArray(payload);
+    const photos = isFull ? payload.photos : payload;
+    const installed = isFull ? (payload as GuardarEjecucionVisitaPayload).equiposInstalados : [];
+
+    const updates: Partial<TaskData> = {
+      fotosEvidencias: [...(photos || []), ...(task.fotosEvidencias || [])],
+      pasos: { ...task.pasos, paso2: 'Completado' },
+    };
+
+    if (installed && installed.length > 0) {
+      const ont = installed.find((eq) => eq.tipo === 'Router ONT');
+      const rep = installed.find((eq) => eq.tipo === 'Repetidor Wi-Fi');
+      const deco = installed.find((eq) => eq.tipo === 'Decodificador TV');
+      const sw = installed.find((eq) => eq.tipo === 'Switch');
+
+      if (ont) {
+        updates.datoOnt = `${ont.marca} ${ont.modelo}`.trim();
+        updates.macNoc = ont.mac;
+      }
+      if (rep) {
+        updates.marcaRepetidor = rep.marca;
+        updates.nroRepetidor = rep.sn;
+      }
+      if (deco) {
+        updates.macTv = deco.mac;
+      }
+      if (sw) {
+        updates.macSwitch = sw.mac;
+      }
+    }
+
+    onUpdateTask(updates);
+    onShowToast('Ejecución de visita guardada y stock técnico actualizado');
   };
 
   const handleSaveReasign = (e: React.FormEvent) => {
@@ -571,6 +609,12 @@ export const AccionesTab: React.FC<AccionesTabProps> = ({
           </button>
         </div>
       </div>
+      {/* Modal Técnico Ejecución Visita */}
+      <TecnicoEjecucionVisitaModal
+        isOpen={isEjecucionModalOpen}
+        onClose={() => setIsEjecucionModalOpen(false)}
+        onSave={handleSaveEjecucion}
+      />
     </div>
   );
 };

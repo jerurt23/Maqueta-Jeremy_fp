@@ -23,6 +23,8 @@ export interface PhotoEvidence {
   timestamp: string;
   isImportant?: boolean;
   category?: string;
+  // Evaluación individual de la foto (solo aplica a fotos de caja / splitter)
+  evaluacion?: 'Bueno' | 'Malo' | '';
 }
 
 export interface CajaEvaluation {

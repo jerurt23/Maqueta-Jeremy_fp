@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import { Copy, Check, Edit2, Save, X } from 'lucide-react';
+import { Copy, Check, Edit2, Save, X, ClipboardList, Wrench } from 'lucide-react';
 import { TaskData } from '../../types/task';
+import {
+  TecnicoEjecucionVisitaModal,
+  GuardarEjecucionVisitaPayload,
+} from '../modals/TecnicoEjecucionVisitaModal';
 
 interface TecnicoTabProps {
   task: TaskData;
@@ -15,6 +19,7 @@ export const TecnicoTab: React.FC<TecnicoTabProps> = ({
 }) => {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEjecucionModalOpen, setIsEjecucionModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({
     troncal: task.troncal,
     odf: task.odf,
@@ -47,6 +52,42 @@ export const TecnicoTab: React.FC<TecnicoTabProps> = ({
     onShowToast('Parámetros técnicos actualizados en Odoo');
   };
 
+  const handleSaveEjecucion = (payload: any) => {
+    const isFullPayload = !Array.isArray(payload);
+    const newPhotos = isFullPayload ? payload.photos : payload;
+    const installed = isFullPayload ? (payload as GuardarEjecucionVisitaPayload).equiposInstalados : [];
+
+    const updates: Partial<TaskData> = {
+      fotosEvidencias: [...(newPhotos || []), ...(task.fotosEvidencias || [])],
+      pasos: { ...task.pasos, paso2: 'Completado' },
+    };
+
+    if (installed && installed.length > 0) {
+      const ont = installed.find((eq) => eq.tipo === 'Router ONT');
+      const deco = installed.find((eq) => eq.tipo === 'Decodificador TV');
+      const rep = installed.find((eq) => eq.tipo === 'Repetidor Wi-Fi');
+      const sw = installed.find((eq) => eq.tipo === 'Switch');
+
+      if (ont) {
+        updates.datoOnt = `${ont.marca} ${ont.modelo}`.trim();
+        updates.macNoc = ont.mac;
+      }
+      if (rep) {
+        updates.marcaRepetidor = rep.marca;
+        updates.nroRepetidor = rep.sn;
+      }
+      if (deco) {
+        updates.macTv = deco.mac;
+      }
+      if (sw) {
+        updates.macSwitch = sw.mac;
+      }
+    }
+
+    onUpdateTask(updates);
+    onShowToast('Ejecución de visita guardada y stock técnico actualizado');
+  };
+
   const technicalItems = [
     { label: 'Troncal:', value: task.troncal, key: 'troncal' },
     { label: 'ODF:', value: task.odf, key: 'odf' },
@@ -65,7 +106,31 @@ export const TecnicoTab: React.FC<TecnicoTabProps> = ({
   ];
 
   return (
-    <div className="space-y-3 text-sm">
+    <div className="space-y-3.5 text-sm">
+      {/* Botón de Ejecución Visita Técnico */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-3.5 text-white shadow-md flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center font-bold">
+            <ClipboardList className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <h4 className="font-extrabold text-xs sm:text-sm text-white leading-tight">
+              Ejecución de Visita Técnica
+            </h4>
+            <p className="text-[11px] text-blue-100">
+              Fotos, descarga de materiales y equipos en stock
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsEjecucionModalOpen(true)}
+          className="px-3.5 py-2 bg-white hover:bg-blue-50 text-blue-700 font-extrabold text-xs rounded-xl shadow-xs transition-all cursor-pointer active:scale-95 shrink-0"
+        >
+          Ejecutar
+        </button>
+      </div>
+
       <div className="flex items-center justify-between px-1">
         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
           Configuración Técnica de Fibra
@@ -176,7 +241,7 @@ export const TecnicoTab: React.FC<TecnicoTabProps> = ({
 
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-xs"
+            className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-xs cursor-pointer shadow-xs"
           >
             <Save className="w-3.5 h-3.5" />
             <span>Guardar Parámetros en Odoo</span>
@@ -207,7 +272,7 @@ export const TecnicoTab: React.FC<TecnicoTabProps> = ({
                 {item.value !== '-' && (
                   <button
                     onClick={() => handleCopy(item.value, item.key)}
-                    className="text-slate-400 hover:text-slate-600 p-1"
+                    className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
                     title="Copiar"
                   >
                     {copiedKey === item.key ? (
@@ -222,6 +287,13 @@ export const TecnicoTab: React.FC<TecnicoTabProps> = ({
           ))}
         </div>
       )}
+
+      {/* Modal Tecnico Ejecución Visita */}
+      <TecnicoEjecucionVisitaModal
+        isOpen={isEjecucionModalOpen}
+        onClose={() => setIsEjecucionModalOpen(false)}
+        onSave={handleSaveEjecucion}
+      />
     </div>
   );
 };

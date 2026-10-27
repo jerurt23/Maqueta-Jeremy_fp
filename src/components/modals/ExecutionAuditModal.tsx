@@ -46,6 +46,7 @@ import { SAMPLE_PHOTOS, DEFAULT_MATERIALES, EQUIPMENT_CATALOG } from '../../data
 import { PhotoLightboxViewer } from './PhotoLightboxViewer';
 import { VTModal } from './VTModal';
 import { RetiroModal } from './RetiroModal';
+import { EvaluatedImage } from '../ui/EvaluatedImage';
 
 interface SaveLockButtonProps {
   isLocked: boolean;
@@ -196,6 +197,10 @@ export const ExecutionAuditModal: React.FC<ExecutionAuditModalProps> = ({
     isOpen: boolean;
     photos: PhotoEvidence[];
     initialIndex: number;
+    onEvaluacionChange?: (
+      id: string,
+      evaluacion: 'Bueno' | 'Malo' | ''
+    ) => void;
   }>({
     isOpen: false,
     photos: [],
@@ -596,7 +601,11 @@ export const ExecutionAuditModal: React.FC<ExecutionAuditModalProps> = ({
 
   const openPhotoViewer = (
     target: PhotoEvidence | string,
-    specificList?: PhotoEvidence[]
+    specificList?: PhotoEvidence[],
+    onEvaluacionChange?: (
+      id: string,
+      evaluacion: 'Bueno' | 'Malo' | ''
+    ) => void
   ) => {
     const listToUse =
       specificList && specificList.length > 0 ? specificList : allModalPhotos;
@@ -629,6 +638,7 @@ export const ExecutionAuditModal: React.FC<ExecutionAuditModalProps> = ({
       isOpen: true,
       photos: listToUse,
       initialIndex: idx,
+      onEvaluacionChange,
     });
   };
 
@@ -658,6 +668,27 @@ export const ExecutionAuditModal: React.FC<ExecutionAuditModalProps> = ({
         paso2: 'Completado',
       },
     });
+  };
+
+  // Establecer evaluación individual de una foto de caja / splitter
+  const handleSetFotoCajaEvaluacion = (
+    photoId: string,
+    evaluacion: 'Bueno' | 'Malo' | ''
+  ) => {
+    const photo = evalCaja.fotosCaja.find((p) => p.id === photoId);
+    const updated = evalCaja.fotosCaja.map((p) =>
+      p.id === photoId ? { ...p, evaluacion } : p
+    );
+    updateEvalCaja({ fotosCaja: updated });
+    if (photo) {
+      const label =
+        evaluacion === 'Malo'
+          ? 'MALO ❌'
+          : evaluacion === 'Bueno'
+          ? 'BUENO ✅'
+          : 'sin evaluar';
+      onShowToast(`Foto "${photo.title}" calificada como: ${label}`);
+    }
   };
 
   // Handlers for Paso 1 (Fachada)
@@ -2072,95 +2103,28 @@ export const ExecutionAuditModal: React.FC<ExecutionAuditModalProps> = ({
                         ) : (
                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
                             {evalCaja.fotosCaja.map((photo) => (
-                              <div
-                                key={photo.id}
-                                className="relative group rounded-xl overflow-hidden border border-slate-200 bg-white shadow-2xs"
-                              >
-                                <img
-                                  src={photo.url}
-                                  alt={photo.title}
-                                  className="w-full h-20 object-cover cursor-pointer"
-                                  onClick={() => openPhotoViewer(photo)}
-                                />
-                                <div className="p-1 bg-white">
-                                  <p className="text-[10px] font-bold text-slate-800 truncate">
-                                    {photo.title}
-                                  </p>
-                                </div>
-                                <button
-                                  onClick={() =>
-                                    updateEvalCaja({
-                                      fotosCaja: evalCaja.fotosCaja.filter((p) => p.id !== photo.id),
-                                    })
-                                  }
-                                  className="absolute top-1 right-1 p-1 bg-red-600/80 hover:bg-red-600 rounded-md text-white"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </button>
-                              </div>
-                            ))}
+                            <EvaluatedImage
+                              key={photo.id}
+                              photo={photo}
+                              square
+                              onDelete={(id) =>
+                                updateEvalCaja({
+                                  fotosCaja: evalCaja.fotosCaja.filter((p) => p.id !== id),
+                                })
+                              }
+                              onPhotoClick={() =>
+                                openPhotoViewer(
+                                  photo,
+                                  undefined,
+                                  handleSetFotoCajaEvaluacion
+                                )
+                              }
+                            />
+                          ))}
                           </div>
                         )}
                       </div>
 
-                      {/* APARTADO 1: Calificar la caja instalada: Bueno, Regular, Malo */}
-                      <div className="space-y-2 pt-1 border-t border-slate-100">
-                        <label className="text-xs font-extrabold text-slate-900 block">
-                          Calificación de la Caja Instalada:
-                        </label>
-                        <div className="grid grid-cols-3 gap-2.5">
-                          {/* Bueno */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              updateEvalCaja({ calificacion: 'Bueno' });
-                              onShowToast('Caja calificada como: BUENO 👍');
-                            }}
-                            className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                              evalCaja.calificacion === 'Bueno'
-                                ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm ring-2 ring-emerald-500/30'
-                                : 'bg-emerald-50/70 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
-                            }`}
-                          >
-                            <ThumbsUp className="w-3.5 h-3.5" />
-                            <span>Bueno</span>
-                          </button>
-
-                          {/* Regular */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              updateEvalCaja({ calificacion: 'Regular' });
-                              onShowToast('Caja calificada como: REGULAR ⚠️');
-                            }}
-                            className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                              evalCaja.calificacion === 'Regular'
-                                ? 'bg-amber-500 text-white border-amber-500 shadow-sm ring-2 ring-amber-400/30'
-                                : 'bg-amber-50/70 hover:bg-amber-100 text-amber-800 border-amber-200'
-                            }`}
-                          >
-                            <AlertTriangle className="w-3.5 h-3.5" />
-                            <span>Regular</span>
-                          </button>
-
-                          {/* Malo */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              updateEvalCaja({ calificacion: 'Malo' });
-                              onShowToast('Caja calificada como: MALO 👎');
-                            }}
-                            className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                              evalCaja.calificacion === 'Malo'
-                                ? 'bg-red-600 text-white border-red-600 shadow-sm ring-2 ring-red-500/30'
-                                : 'bg-red-50/70 hover:bg-red-100 text-red-800 border-red-200'
-                            }`}
-                          >
-                            <ThumbsDown className="w-3.5 h-3.5" />
-                            <span>Malo</span>
-                          </button>
-                        </div>
-                      </div>
 
                       {/* APARTADO 2: Foto de las potencias de la caja y casa */}
                       <div
@@ -3951,6 +3915,7 @@ export const ExecutionAuditModal: React.FC<ExecutionAuditModalProps> = ({
         photos={viewerState.photos}
         initialIndex={viewerState.initialIndex}
         onClose={() => setViewerState((prev) => ({ ...prev, isOpen: false }))}
+        onEvaluacionChange={viewerState.onEvaluacionChange}
       />
     </div>
   );

@@ -439,3 +439,145 @@ export const EQUIPMENT_CATALOG: EquipmentCatalogItem[] = [
     marca: 'FiberHome AN5506',
   },
 ];
+
+
+export interface TecnicoStockMaterial {
+  id: string;
+  nombre: string;
+  categoria: string;
+  stock: number;
+  unidad: string;
+}
+
+export interface TecnicoStockEquipo {
+  id: string;
+  sn: string;
+  mac: string;
+  marca: string;
+  modelo: string;
+  tipo: 'Router ONT' | 'Decodificador TV' | 'Repetidor Wi-Fi' | 'Switch' | string;
+}
+
+export const STOCK_TECNICO_MATERIALES: TecnicoStockMaterial[] = [
+  {
+    id: 'stm-1',
+    nombre: 'Conector mecánico SC/APC',
+    categoria: 'Conectorización',
+    stock: 24,
+    unidad: 'und',
+  },
+  {
+    id: 'stm-2',
+    nombre: 'Roseta óptica FTTH',
+    categoria: 'Terminales',
+    stock: 10,
+    unidad: 'und',
+  },
+  {
+    id: 'stm-3',
+    nombre: 'Patchcord SC/APC Verde 2m',
+    categoria: 'Patchcords',
+    stock: 15,
+    unidad: 'und',
+  },
+  {
+    id: 'stm-4',
+    nombre: 'Cable Drop 1 Hilo (G.657A2)',
+    categoria: 'Fibra Óptica',
+    stock: 250,
+    unidad: 'm',
+  },
+  {
+    id: 'stm-5',
+    nombre: 'Manguito termocontraíble 40mm',
+    categoria: 'Fusión',
+    stock: 40,
+    unidad: 'und',
+  },
+  {
+    id: 'stm-6',
+    nombre: 'Cintillos plásticos negros 20cm',
+    categoria: 'Ferretería',
+    stock: 100,
+    unidad: 'und',
+  },
+  {
+    id: 'stm-7',
+    nombre: 'Grapas para cable de fibra blanca',
+    categoria: 'Ferretería',
+    stock: 120,
+    unidad: 'und',
+  },
+  {
+    id: 'stm-8',
+    nombre: 'Conector rápido RJ45 Cat6',
+    categoria: 'Redes UTP',
+    stock: 30,
+    unidad: 'und',
+  },
+  {
+    id: 'stm-9',
+    nombre: 'Cable UTP Cat5e interior',
+    categoria: 'Redes UTP',
+    stock: 90,
+    unidad: 'm',
+  },
+  {
+    id: 'stm-10',
+    nombre: 'Templador plástico para drop',
+    categoria: 'Ferretería',
+    stock: 18,
+    unidad: 'und',
+  },
+];
+
+export const STOCK_TECNICO_EQUIPOS: TecnicoStockEquipo[] = [
+  {
+    id: 'ste-1',
+    sn: '4857544397BBAFB',
+    mac: '68962ECA0ABE',
+    marca: 'Huawei 6 wifi',
+    modelo: 'OptiXstar EG8145V5',
+    tipo: 'Router ONT',
+  },
+  {
+    id: 'ste-2',
+    sn: '5A544547D6DDF359',
+    mac: '2B ROUTER',
+    marca: 'ZTE ZXHN F670L',
+    modelo: 'Dual Band AC1200',
+    tipo: 'Router ONT',
+  },
+  {
+    id: 'ste-3',
+    sn: 'ZTEGC7A12BC3',
+    mac: 'A42B8C1D2E3F',
+    marca: 'ZTE F670L Wifi 6',
+    modelo: 'AX3000 GPON',
+    tipo: 'Router ONT',
+  },
+  {
+    id: 'ste-4',
+    sn: 'HW20249811',
+    mac: '485702A1B2C3',
+    marca: 'Huawei',
+    modelo: 'WA8021V5 MESH',
+    tipo: 'Repetidor Wi-Fi',
+  },
+  {
+    id: 'ste-5',
+    sn: 'DEC99218201',
+    mac: 'AC83F31244AA',
+    marca: 'ZTE',
+    modelo: 'ZXV10 B866V2 Android TV',
+    tipo: 'Decodificador TV',
+  },
+  {
+    id: 'ste-6',
+    sn: 'SW8P100293',
+    mac: '001A2B3C4D5E',
+    marca: 'TP-Link',
+    modelo: 'SG108 Gigabit 8 Puertos',
+    tipo: 'Switch',
+  },
+];

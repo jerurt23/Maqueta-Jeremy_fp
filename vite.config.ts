@@ -17,6 +17,10 @@ export default defineConfig(() => {
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      // Vite blocks unknown Host headers (DNS-rebinding protection). Live tunnels like
+      // `cloudflared tunnel --url` use ephemeral *.trycloudflare.com hostnames, so allow
+      // them by default. Set ALLOWED_HOSTS=host1,host2 to re-lock it down to a fixed list.
+      allowedHosts: (process.env.ALLOWED_HOSTS ? process.env.ALLOWED_HOSTS.split(',') : true) as true | string[],
     },
   };
 });
