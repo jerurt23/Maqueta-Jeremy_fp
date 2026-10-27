@@ -339,7 +339,7 @@ export const INITIAL_TASKS: TaskData[] = [
     inicio: '-',
     suspBaja: '2025-03-22',
     ordenRatio: '1/2',
-    estado: 'PENDIENTE',
+    estado: 'LIQUIDADO',
     jefeTecnico: 'Ing. Carlos Mendoza (LIMA NORTE)',
     tecAsignado: 'Rodrigo Chire',
     fachadaUrl: null,
@@ -358,10 +358,11 @@ export const INITIAL_TASKS: TaskData[] = [
     jefeSeleccionado: 'Ing. Carlos Mendoza (LIMA NORTE)',
     tecSeleccionado: 'Rodrigo Chire',
     horaInicio: '09:30 AM',
+    horaFin: '17/10/2026 11:42',
     pasos: {
-      paso1: 'En Proceso',
-      paso2: 'Pendiente',
-      paso3: 'Pendiente',
+      paso1: 'Completado',
+      paso2: 'Completado',
+      paso3: 'Completado',
     },
 
     fotosFachada: [],

@@ -7,8 +7,9 @@ import {
   ChevronDown,
   Lock,
   Unlock,
+  Clock,
 } from 'lucide-react';
-import { PhotoEvidence } from '../../types/task';
+import { PhotoEvidence, TaskData } from '../../types/task';
 
 /**
  * Componentes compartidos por los modulos VTModal y RetiroModal.
@@ -61,7 +62,7 @@ export const SectionHeader: React.FC<{
   switchValue?: boolean;
   onSwitchToggle?: () => void;
   switchColor?: string;
-  /** Color del texto SÍ/NO. Por defecto ámbar (VT). Retiro usa rose. */
+  /** Color del texto SÃ/NO. Por defecto Ã¡mbar (VT). Retiro usa rose. */
   switchTextColor?: string;
   locked?: boolean;
   expanded: boolean;
@@ -94,7 +95,7 @@ export const SectionHeader: React.FC<{
         <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
           <Switch value={switchValue} onToggle={onSwitchToggle} color={switchColor} />
           <span className={`text-[11px] font-extrabold ${switchValue ? switchTextColor : 'text-slate-400'}`}>
-            {switchValue ? 'SÍ' : 'NO'}
+            {switchValue ? 'SÃ' : 'NO'}
           </span>
         </div>
       )}
@@ -242,5 +243,54 @@ export const SaveLockButton: React.FC<{
       <Lock className="w-4 h-4" />
       <span>{isLocking ? 'Guardando...' : label}</span>
     </button>
+  );
+};
+
+/** Formatea una fecha como `dd/mm/yyyy hh:mm` (hora local). */
+export const formatFechaHoraFin = (date: Date = new Date()): string => {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
+const FIN_PILL =
+  'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border whitespace-nowrap shrink-0';
+const FIN_VARIANT = {
+  oficial: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+  pendiente: 'bg-slate-100 text-slate-500 border-slate-200',
+};
+
+/**
+ * Campo de solo lectura con la fecha y hora de finalizaciÃ³n de la tarea.
+ * Va junto al h3 del Paso 3. Muestra "Pendiente" hasta que se cierra el Paso 3
+ * (momento en el que se escribe `task.horaFin`).
+ */
+export const HoraFinalField: React.FC<{ task: TaskData }> = ({ task }) => {
+  const oficial =
+    typeof task.horaFin === 'string' &&
+    task.horaFin.trim() !== '' &&
+    task.horaFin !== 'Pendiente';
+
+  if (oficial) {
+    return (
+      <span
+        className={`${FIN_PILL} ${FIN_VARIANT.oficial}`}
+        title="Fecha y hora de finalizaciÃ³n de la tarea"
+      >
+        <Clock className="w-3 h-3" />
+        <span>Hora Final:</span>
+        <strong className="font-black">{task.horaFin}</strong>
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={`${FIN_PILL} ${FIN_VARIANT.pendiente}`}
+      title="Se registrarÃ¡ cuando se cierre el Paso 3"
+    >
+      <Clock className="w-3 h-3" />
+      <span>Hora Final:</span>
+      <strong className="font-black">Pendiente</strong>
+    </span>
   );
 };
